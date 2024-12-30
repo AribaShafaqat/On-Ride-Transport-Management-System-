@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<style>
+    /* Table container */
+    #vehicle-list {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    /* Table Header */
+    #vehicle-list th {
+        background-color: #210440;
+        /* Match your project theme color */
+        color: white;
+        padding: 12px;
+        text-align: left;
+        font-weight: bold;
+        border: 1px solid #ddd;
+    }
+
+    /* Table Data */
+    #vehicle-list td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    /* Row Hover Effect */
+    #vehicle-list tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Table Odd Row Color */
+    #vehicle-list tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+
+    /* Action Buttons */
+    #vehicle-list button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    #vehicle-list button:hover {
+        background-color: #ff3333;
+    }
+    .driver-card {
+        background-color: #e5d1eb; /* Light lavender background */
+        border: 2px solid #210440; /* Dark purple border */
+        border-radius: 10px; /* Rounded corners */
+        padding: 20px; /* Internal spacing */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        margin: 15px 0; /* Space between cards */
+        display: flex;
+        flex-direction: column; /* Stack content vertically */
+        align-items: center; /* Center align items */
+        transition: transform 0.2s, box-shadow 0.2s; /* Hover effects */
+      }
+      
+      .driver-card:hover {
+        transform: scale(1.02); /* Slightly enlarge on hover */
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+      }
+      
+      .driver-card h3 {
+        color: #210440; /* Dark purple text for headings */
+        font-size: 20px; /* Adjust font size */
+        margin-bottom: 10px; /* Space below the heading */
+      }
+      
+      .driver-card p {
+        color: #333; /* Neutral text color */
+        font-size: 16px; /* Readable text size */
+        margin: 5px 0; /* Space between paragraphs */
+      }
+      
+      .driver-card .status {
+        font-weight: bold;
+        color: #ffbb0f; /* Bright yellow for important info */
+      }
+      
+      .driver-card button {
+        margin-top: 10px; /* Space above button */
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #210440; /* Dark purple text */
+        background-color: #ffbb0f; /* Bright yellow background */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+      }
+      
+      .driver-card button:hover {
+        background-color: #210440; /* Dark purple on hover */
+        color: #ffbb0f; /* Yellow text on hover */
+        transform: scale(1.05); /* Slight enlargement on hover */
+      }
+      /* Driver Management Section Container */
+#driver-management {
+    background-color: #e5d1eb; /* Light lavender background */
+    border: 2px solid #210440; /* Dark purple border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Internal spacing */
+    margin: 20px; /* Space around the section */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-width: 800px; /* Limit width for readability */
+    margin-left: auto; /* Center the section horizontally */
+    margin-right: auto;
+  }
+  
+  /* Section Heading */
+  #driver-management h2 {
+    color: #210440; /* Dark purple text */
+    font-size: 24px; /* Larger font size for prominence */
+    text-align: center; /* Center the heading */
+    margin-bottom: 20px; /* Space below heading */
+    text-transform: uppercase; /* Capitalized text for emphasis */
+    border-bottom: 2px solid #210440; /* Underline for separation */
+    display: inline-block; /* Adjust width to fit text */
+    padding-bottom: 5px; /* Padding for better visual spacing */
+  }
+  
+  /* Pending Driver List Container */
+  #pending-driver-list {
+    background-color: #fff; /* White background for contrast */
+    border: 1px solid #210440; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Internal padding */
+    max-height: 400px; /* Limit height for scrolling */
+    overflow-y: auto; /* Add vertical scrolling if needed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow */
+  }
+  
+  /* Driver Item in the List */
+  #pending-driver-list .driver-item {
+    padding: 10px 15px;
+    margin: 10px 0;
+    background-color: #ffbb0f; /* Bright yellow background */
+    color: #210440; /* Dark purple text */
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex; /* For alignment */
+    justify-content: space-between; /* Space between text and action */
+    align-items: center; /* Center align items vertically */
+    transition: background-color 0.3s ease;
+  }
+  
+  #pending-driver-list .driver-item:hover {
+    background-color: #210440; /* Dark purple on hover */
+    color: #ffbb0f; /* Yellow text on hover */
+  }
+  
+  /* Buttons for Driver Actions */
+  #pending-driver-list .driver-item button {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff; /* White text */
+    background-color: #210440; /* Dark purple background */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  #pending-driver-list .driver-item button:hover {
+    background-color: #ffbb0f; /* Yellow background on hover */
+    color: #210440; /* Purple text on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+  }
+  
+    /* Responsiveness */
+    @media (max-width: 768px) {
+
+        #vehicle-list th,
+        #vehicle-list td {
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        #vehicle-list {
+            font-size: 14px;
+        }
+
+        /* Stack table columns for smaller screens */
+        #vehicle-list td {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #vehicle-list td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+        }
+    }
+</style>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">Admin Panel</div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" onclick="showSection('dashboard')"><i
+                                class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="showSection('customer-management')"><i class="fas fa-users"></i> Customer
+                            Management</a></li>
+                    <li><a href="#" onclick="showSection('driver-management'); fetchPendingDriverRequests()"><i class="fas fa-car"></i> Driver
+                            Management</a></li>
+                </ul>
+            </nav>
+            <div class="profile-section">
+                <button id="profileButton" class="profile-button">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div id="user-info" class="user-info">
+                    <p id="userName"></p>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <header>
+                    <h1>Welcome, Admin</h1>
+                    <p>Manage your system with ease.</p>
+                </header>
+                <div class="overview">
+                    <div class="card">
+                        <i class="fas fa-user-friends"></i>
+
+                        <h3>Total Customers</h3>
+                         <p class="passenger-count" id="passengerCount">Loading...</p>
+                    </div>
+                    <div class="card">
+                        <i class="fas fa-car-side"></i>
+                        <h3>Active Vehicles</h3>
+                        <p class="vehicles-count" id="vehiclesCount">Loading...</p>
+                    </div>
+                    <div class="card">
+                        <i class="fas fa-car-side"></i>
+                        <h3>Active Drivers</h3>
+                        <p class="driver-count" id="driverCount">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Management Section -->
+            <div id="customer-management" class="content-section" style="display: none;">
+                <h2>Customer Management</h2>
+                <p>Manage customer details here.</p>
+            </div>
+
+            <!-- Vehicle Management Section -->
+            <div id="driver-management" class="content-section" onclick style = "display: none;">
+                <h2>Driver Management</h2>
+                <div id="pending-driver-list"></div>
+            </div>
+                <script>
+                    function toggleLogoutButton() {
+                        const logoutBtn = document.getElementById('logout-btn');
+                        logoutBtn.style.display = logoutBtn.style.display === 'block' ? 'none' : 'block';
+                    }
+
+                    // Logout functionality
+                    function logout() {
+                        alert('Logged out successfully!');
+                    }
+
+                   
+// Function to show selected section
+function showSection(sectionId) {
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => section.style.display = 'none');
+    document.getElementById(sectionId).style.display = 'block';
+
+    const links = document.querySelectorAll('.sidebar nav ul li a');
+    links.forEach(link => link.classList.remove('active'));
+
+    // Add the active class to the clicked link
+    const activeLink = document.querySelector(`a[href="#"][onclick*="showSection('${sectionId}')"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+}
+
+                    document.getElementById("profileButton").addEventListener("click", function () {
+                        const userInfo = document.getElementById("user-info");
+                        if (userInfo.style.display === "none" || userInfo.style.display === "") {
+                            fetchUserSession();
+                            userInfo.style.display = "block";
+                        } else {
+                            userInfo.style.display = "none";
+                        }
+                    });
+                    async function fetchUserSession() {
+                        try {
+                            const token = sessionStorage.getItem('token'); // Get JWT from localStorage
+                            if (!token) {
+                                document.getElementById('user-info').innerHTML = '<p>No user logged in.</p>';
+                                return;
+                            }
+                            const response = await fetch('https://saber-windy-nape.glitch.me/auth/get-session-user', {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            const data = await response.json();
+                            if (data.username) {
+                                // Display user info in a profile format
+                                document.getElementById('user-info').innerHTML = `
+                                    <p><strong>Welcome </strong> ${data.username}</p>
+                                    ${data.email ? `<p><strong>Email:</strong> ${data.email}</p>` : ""}
+                                    <button class = "logout-btn" onclick = "logout()">Logout</button>
+                                `;
+                            } else {
+                                document.getElementById('user-info').innerHTML = '<p>User not found.</p>';
+                            }
+                        } catch (error) {
+
+                            document.getElementById('user-info').innerHTML = `<p>Error fetching user info: ${error.message}</p>`;
+                        }
+                    }
+                    function logout() {
+                        sessionStorage.removeItem('token');
+                        window.location.href = 'login copy.html';
+                    }
+                    window.onload = () => {
+                        const token = sessionStorage.getItem('token');
+                        if (!token) {
+                            window.location.href = 'login copy.html';
+                        } else {
+                            fetchUserSession();
+                        }
+                    };
+                </script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

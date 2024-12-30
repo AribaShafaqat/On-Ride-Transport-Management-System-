@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver Panel</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <style>
+    /* Table container */
+    #vehicle-list {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      padding: 10px;
+      background-color: #210440;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh; /* Full viewport height */
+
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 260px; /* Adjust according to sidebar width */
+      min-height: 100vh; /* Ensures the content takes up full screen height */
+      padding: 20px;
+      background-color: #fff;
+    }
+
+    /* Add a bit of padding to the bottom of the page */
+    body {
+      padding-bottom: 30px; /* Adjust for footer if needed */
+    }
+    #vehicle-management {
+      padding: 20px; /* Add space inside the container */
+      margin-top: 10px; /* Add space above the section */
+      background-color: #f9f9f9; /* Light background for contrast */
+      border: 1px solid #ddd; /* Border for definition */
+      border-radius: 8px; /* Smooth edges */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    }
+    
+    #vehicle-management h2 {
+      margin-top: 0; /* Remove extra margin on the heading */
+      color: #333; /* Darker text for the heading */
+      font-size: 24px; /* Adjust font size for visibility */
+    }
+    
+    #vehicle-list {
+      margin-top: 10px; /* Add spacing below the heading */
+    }
+    
+    /* Table Header */
+    #vehicle-list th {
+      background-color: #210440; /* Match your project theme color */
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+      border: 1px solid #ddd;
+    }
+
+    /* Table Data */
+    #vehicle-list td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    /* Row Hover Effect */
+    #vehicle-list tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    /* Table Odd Row Color */
+    #vehicle-list tr:nth-child(odd) {
+      background-color: #f9f9f9;
+    }
+
+    /* Action Buttons */
+    #vehicle-list button {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    #vehicle-list button:hover {
+      background-color: #ff3333;
+    }
+
+    /* Vehicle Table */
+    .vehicle-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .vehicle-table th,
+    .vehicle-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .vehicle-table th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .vehicle-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .vehicle-table tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .delete-btn {
+      padding: 5px 10px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    #ride-info {
+      padding: 20px; /* Internal spacing */
+      background-color: #e5d1eb; /* Light lavender background */
+      border: 2px solid #210440; /* Dark purple border */
+      border-radius: 8px; /* Rounded corners */
+      color: #210440; /* Text color */
+      font-family: Arial, sans-serif; /* Clean, modern font */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+      text-align: center; /* Center the content */
+      max-width: 400px; /* Limit the width for a compact design */
+      margin: 20px auto; /* Center the div horizontally with space on top */
+    }
+    
+    #ride-info p {
+      font-size: 16px; /* Slightly larger text for readability */
+      margin-bottom: 15px; /* Space between the message and buttons */
+    }
+    
+    #ride-info button {
+      padding: 10px 20px; /* Button size */
+      font-size: 14px; /* Button text size */
+      font-weight: bold; /* Bold text for emphasis */
+      color: #ffbb0f; /* Dark text color for contrast */
+      background-color: #210440; /* Bright yellow button background */
+      border: 2px solid #210440; /* Border matching the theme */
+      border-radius: 5px; /* Rounded corners for buttons */
+      cursor: pointer; /* Pointer cursor for interactivity */
+      margin: 5px; /* Spacing between buttons */
+      transition: background-color 0.3s, transform 0.2s; /* Smooth hover effect */
+    }
+    
+    #ride-info button:hover {
+      background-color: #ffbb0f; /* Light lavender background on hover */
+      color: #210440; /* Yellow text on hover */
+      transform: scale(1.05); /* Slight scaling for feedback */
+    }
+    /* The Modal (background) */
+.modal {
+  position: fixed; 
+  z-index: 9999; /* Ensure it appears above other elements */
+  left: 0; 
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker background for better contrast */
+  overflow: auto; /* Enable scroll if needed */
+  display: flex; /*Use flex to center modal */ 
+  justify-content: center; /* Align horizontally center */
+  align-items: center; 
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #e5d1eb; /* A very light grey for better contrast */
+  padding: 30px;
+  border: 1px solid #210440; /* Matching border color with your button */
+  width: 50%; /* Adjust the width to create a more balanced look */
+  max-width: 500px; /* Set a max-width */
+  text-align: center;
+  border-radius: 10px; /* Slightly larger rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow for better visibility */
+  font-family: 'Montserrat', sans-serif; /* Matching website font */
+  color: #210440; /* Dark text for better readability */
+}
+
+/* Modal Text */
+.modal-content p {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #210440; /* Dark text color */
+}
+
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#ride-request-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #e5d1eb;
+  border: 1px solid #ccc;
+  border-radius: 10px; /* Slightly larger rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow for better visibility */
+  font-family: 'Montserrat', sans-serif; /* Matching website font */
+  color: #210440; /* Dark text for better readability */
+  padding: 20px;
+  z-index: 1000;
+  width: 50%;
+}
+
+#ride-request-modal button {
+  padding: 10px 20px; /* Button size */
+      font-size: 14px; /* Button text size */
+      font-weight: bold; /* Bold text for emphasis */
+      color: #ffbb0f; /* Dark text color for contrast */
+      background-color: #210440; /* Bright yellow button background */
+      border: 2px solid #210440; /* Border matching the theme */
+      border-radius: 5px; /* Rounded corners for buttons */
+      cursor: pointer; /* Pointer cursor for interactivity */
+      margin: 5px; /* Spacing between buttons */
+      transition: background-color 0.3s, transform 0.2s; /* Smooth hover effect */
+}
+
+/* Modal Text */
+#ride-request-modal p {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #210440; /* Dark text color */
+}
+body {
+  overflow: hidden; /* Prevent background scrolling when modal is open */
+}
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
+      #vehicle-list th,
+      #vehicle-list td {
+        padding: 8px;
+        font-size: 14px;
+      }
+
+      #vehicle-list {
+        font-size: 14px;
+      }
+
+      /* Stack table columns for smaller screens */
+      #vehicle-list td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      #vehicle-list td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      #ride-info {
+        margin-top: 20px;
+      }
+
+      button {
+        padding: 10px;
+        margin: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      button:hover {
+        background-color: #ffbb00;
+        color: white;
+      }
+
+      .sidebar {
+        width: 250px;
+        padding: 10px;
+      }
+
+      .main-content {
+        margin-left: 260px;
+      }
+
+      .profile-section {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+      }
+
+      .profile-button {
+        background-color: #210440;
+        border: none;
+        color: white;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        font-size: 20px;
+      }
+    }
+    .regi-vehcile {
+      margin-top: 20px; /* Space above the container */
+      text-align: center; /* Center the button */
+    }
+
+    #register-vehicle-btn {
+      background-color: #210440; /* Green background color */
+      color: white; /* White text */
+      padding: 12px 24px; /* Padding for button */
+      border: none; /* Remove default border */
+      border-radius: 8px; /* Rounded corners */
+      font-size: 16px; /* Larger font size */
+      cursor: pointer; /* Change cursor to pointer */
+      transition: background-color 0.3s ease; /* Smooth background color transition */
+    }
+
+    #register-vehicle-btn:hover {
+      background-color: #ffbb00;
+      color: #210440; /* Darker green when hovered */
+    }
+
+    #register-vehicle-btn:active {
+      background-color: #ffbb00;
+      color: #210440; /* Even darker green when button is clicked */
+    }
+
+    #register-vehicle-btn:focus {
+      outline: none; /* Remove focus outline */
+    }
+  </style>
+
+  <body>
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">Driver Panel</div>
+        <nav>
+          <ul>
+            <li>
+              <a href="#" class="active" onclick="showSection('dashboard')"
+                ><i class="fas fa-tachometer-alt"></i> Dashboard</a
+              >
+            </li>
+            <li>
+              <a href="#" onclick="showSection('passenger-management')"
+                ><i class="fas fa-users"></i> Passenger Management</a
+              >
+            </li>
+            <li>
+              <a href="#" onclick="showSection('vehicle-management'); fetchDriverVehicles(); ">
+                <i class="fas fa-car"></i> Vehicle Management
+              </a>
+            </li>
+            
+          </ul>
+        </nav>
+        <div class="profile-section">
+          <button id="profileButton" class="profile-button">
+            <i class="fas fa-user-circle"></i>
+          </button>
+          <div id="user-info" class="user-info">
+            <p id="userName"></p>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+          <header>
+            <h1>Welcome</h1>
+            <div id="user-info" class="user-info">
+              <p id="userName"></p>
+            </div>
+            <p>Manage your system with ease.</p>
+          </header>
+          <div class="overview">
+            <div class="card">
+              <i class="fas fa-user-friends"></i>
+              <h3>Total Customers</h3>
+              <p class="passenger-count" id="passengerCount">Loading...</p>
+            </div>
+            <div class="card">
+              <i class="fas fa-car-side"></i>
+              <h3>Active Rides</h3>
+              <p class="ride-status" id="ridestatus">Loading...</p>
+            </div>
+            <div class="card">
+              <i class="fas fa-tasks"></i>
+              <h3>Total Rides</h3>
+              <p class="ride-count" id="rideCount">Loading...</p>
+            </div>
+            <div class="card">
+              <i class="fas fa-tasks"></i>
+              <h3>Total Fare</h3>
+              <p class="fare" id="fare">Loading...</p>
+            </div>
+          </div>
+
+          <div id="ride-info">
+            <p id="ride-request-msg"></p>
+            <button id="accept-ride-btn" style="display: none">
+              Accept Ride
+            </button>
+          </div>
+
+          <div class="regi-vehcile">
+            <button
+              id="register-vehicle-btn"
+              onclick="checkDriverRegistrationStatus()"
+            >
+              Register a New Vehicle
+            </button>
+          </div>
+        </div>
+        
+        <!-- Vehicle Management Section     onclick="fetchDriverVehicles()" -->
+        <div id="vehicle-management" class="content-section" style="display: none">
+          <h2>Vehicle Management</h2>
+          <div id="vehicle-list"></div>
+        </div>
+        
+        <div id="passenger-management" class="content-section" style="display: none">
+          <h2>Customer Management</h2>
+          <p>Manage customer details here.</p>
+        </div>
+
+        <div id="map" style="height: 400px"></div>
+
+        
+
+        <div id="messageModal" class="modal" style="visibility: hidden">
+          <div class="modal-content">
+            <span id="closeMessageModal" class="close">&times;</span>
+            <p id="messageText"></p>
+          </div>
+        </div>
+        <div id="ride-request-modal" style="display: none;">
+          <p id="ride-request-msg"></p>
+          <button id="modal-accept-btn">Accept</button>
+          <button id="modal-reject-btn">Reject</button>
+      </div>
+      
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+        <script src="driver.js"></script>
+      </div>
+    </div>
+  </body>
+</html>
